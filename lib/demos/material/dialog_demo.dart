@@ -221,7 +221,7 @@ class _DialogDemoState extends State<DialogDemo> with RestorationMixin {
                       _simpleDialogRoute.present();
                       break;
                     case DialogDemoType.fullscreen:
-                      Navigator.restorablePush<void>(
+                      Navigator.restorablePush(
                           context, _fullscreenDialogRoute);
                       break;
                   }
