@@ -90,6 +90,9 @@ class GalleryApp extends StatelessWidget {
             darkTheme: GalleryThemeData.darkThemeData.copyWith(
               platform: options.platform,
             ),
+            navigatorObservers: [
+              FlutterUxcamNavigatorObserver(),
+            ],
             localizationsDelegates: const [
               ...GalleryLocalizations.localizationsDelegates,
               LocaleNamesLocalizationsDelegate()
