@@ -8,6 +8,7 @@ import 'package:gallery/constants.dart';
 import 'package:gallery/data/demos.dart';
 import 'package:gallery/layout/adaptive.dart';
 import 'package:gallery/pages/demo.dart';
+import 'package:flutter_uxcam/flutter_uxcam.dart';
 
 typedef CategoryHeaderTapCallback = Function(bool shouldOpenList);
 
@@ -50,6 +51,7 @@ class _CategoryListItemState extends State<CategoryListItem>
   @override
   void initState() {
     super.initState();
+    FlutterUxcam.tagScreenName("Category - ${widget.category.name}"); // 👈 Screen tag
 
     _controller = AnimationController(duration: _expandDuration, vsync: this);
     _controller.addStatusListener((status) {
@@ -102,18 +104,24 @@ class _CategoryListItemState extends State<CategoryListItem>
   }
 
   void _handleTap() {
-    if (_shouldOpenList()) {
-      _controller.forward();
-      if (widget.onTap != null) {
-        widget.onTap!(true);
-      }
-    } else {
-      _controller.reverse();
-      if (widget.onTap != null) {
-        widget.onTap!(false);
-      }
+  if (_shouldOpenList()) {
+    _controller.forward();
+    FlutterUxcam.logEventWithProperties("Category Expanded", {
+      'category': widget.category.name,
+    }); // Track category expansion
+    if (widget.onTap != null) {
+      widget.onTap!(true);
+    }
+  } else {
+    _controller.reverse();
+    FlutterUxcam.logEventWithProperties("Category Collapsed", {
+      'category': widget.category.name,
+    }); // Track collapse
+    if (widget.onTap != null) {
+      widget.onTap!(false);
     }
   }
+}
 
   Widget _buildHeaderWithChildren(BuildContext context, Widget? child) {
     return Column(
@@ -293,6 +301,10 @@ class CategoryDemoItem extends StatelessWidget {
       child: MergeSemantics(
         child: InkWell(
           onTap: () {
+            FlutterUxcam.logEventWithProperties("Demo Clicked", {
+              'demo': demo.title,
+              'category': demo.category?.name ?? "unknown", // If available
+            }); // 👈 Track demo tap
             Navigator.of(context).restorablePushNamed(
               '${DemoPage.baseRoute}/${demo.slug}',
             );

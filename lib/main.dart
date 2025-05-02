@@ -17,6 +17,7 @@ import 'package:gallery/pages/splash.dart';
 import 'package:gallery/routes.dart';
 import 'package:gallery/themes/gallery_theme_data.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_uxcam/flutter_uxcam.dart';
 
 import 'firebase_options.dart';
 import 'layout/adaptive.dart';
@@ -32,6 +33,13 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // ✅ Initialize UXCam
+    FlutterUxcam.optIntoSchematicRecordings();
+    final config = FlutterUxConfig(
+      userAppKey: 'wht80sgk5dd5mjc', // Replace this
+      enableAutomaticScreenNameTagging: false,
+    );
+    await FlutterUxcam.startWithConfiguration(config);
     FlutterError.onError = (errorDetails) {
       FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
     };

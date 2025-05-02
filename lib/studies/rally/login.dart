@@ -11,6 +11,8 @@ import 'package:gallery/layout/image_placeholder.dart';
 import 'package:gallery/layout/text_scale.dart';
 import 'package:gallery/studies/rally/app.dart';
 import 'package:gallery/studies/rally/colors.dart';
+import 'package:flutter_uxcam/flutter_uxcam.dart';
+//import 'package:flutter_uxcam/uxblur.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,11 +22,23 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> with RestorationMixin {
+  final FlutterUXBlur _loginScreenBlur = FlutterUXBlur(
+    blurRadius: 10,
+    blurType: BlurType.gaussian,
+    hideGestures: true,
+  );
   final RestorableTextEditingController _usernameController =
       RestorableTextEditingController();
   final RestorableTextEditingController _passwordController =
       RestorableTextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    FlutterUxcam.tagScreenName("Rally Login Page");
+    FlutterUxcam.applyOcclusion(_loginScreenBlur);
+  }
+  
   @override
   String get restorationId => 'login_page';
 
@@ -50,6 +64,7 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
 
   @override
   void dispose() {
+    FlutterUxcam.removeOcclusion(_loginScreenBlur);
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -66,6 +81,20 @@ class _MainView extends StatelessWidget {
   final TextEditingController? passwordController;
 
   void _login(BuildContext context) {
+    final username = usernameController?.text ?? 'unknown_user';
+    // Identify user in UXCam
+    FlutterUxcam.setUserIdentity(username);
+    FlutterUxcam.setUserProperty("username", username);
+    FlutterUxcam.setUserProperty("onboardingStage", "1_of_5");
+    FlutterUxcam.setUserProperty("language", "en");
+    FlutterUxcam.setUserProperty("loginMethod", "manual");
+
+    FlutterUxcam.logEvent("login_button_pressed");
+    FlutterUxcam.logEventWithProperties("login_success", {
+      "username": username,
+      "login_method": "manual",
+    });
+
     Navigator.of(context).restorablePushNamed(RallyApp.homeRoute);
   }
 
@@ -233,6 +262,9 @@ class _UsernameInput extends StatelessWidget {
           decoration: InputDecoration(
             labelText: GalleryLocalizations.of(context)!.rallyLoginUsername,
           ),
+          onTap: () {
+            FlutterUxcam.logEvent("username_field_focused");
+          },
         ),
       ),
     );
@@ -260,6 +292,9 @@ class _PasswordInput extends StatelessWidget {
             labelText: GalleryLocalizations.of(context)!.rallyLoginPassword,
           ),
           obscureText: true,
+          onTap: () {
+            FlutterUxcam.logEvent("password_field_focused");
+          },
         ),
       ),
     );
